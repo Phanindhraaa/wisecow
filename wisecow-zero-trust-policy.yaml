@@ -1,0 +1,27 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-zero-trust
+  namespace: default
+spec:
+  severity: 5
+  selector:
+    matchLabels:
+      app: wisecow  # Match your Wisecow pod label
+  process:
+    matchPaths: []
+    action: Block  # Block all process executions not explicitly allowed
+  file:
+    matchPaths: []
+    matchDirectories: []
+    action: Block  # Block all file accesses not explicitly allowed
+  network:
+    matchProtocols:
+      - protocol: TCP
+        port: 4499   # Allow only the application port, change as appropriate
+        direction: Ingress
+    action: Allow  # Only allow inbound to app port; everything else denied
+  capabilities:
+    matchCapabilities: []
+    action: Block  # Block all Linux capability elevations
+  action: Block   # Deny all by default, except above network rule
